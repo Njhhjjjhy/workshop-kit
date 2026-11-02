@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>動手做</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #222222;
+  --fg: #ffffff;
+  --muted: #c0c0c0;
+  --subtle: #909090;
+  --border: #3a3a3a;
+  --accent: #4a9ead;
+  --accent-2: #d4807a;
+  --surface: color-mix(in srgb, var(--fg) 5%, var(--bg));
+  --font-body: "DM Sans", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+  --font-zh: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f7fafa;
+    --fg: #24403d;
+    --muted: #46534f;
+    --subtle: #46534f;
+    --border: #b9c6c3;
+    --accent: #2d7a87;
+    --accent-2: #a35550;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 24px;
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  display: flex; flex-direction: column; gap: 48px;
+}
+h1, h2, h3, p { margin: 0; }
+:lang(zh-TW), .zh { font-family: var(--font-zh); font-style: normal; }
+header { display: flex; flex-direction: column; gap: 8px; }
+h1 { font-family: var(--font-zh); font-weight: 600; font-size: 34px; line-height: 1.25; }
+header p { color: var(--muted); }
+section { display: flex; flex-direction: column; gap: 16px; }
+.label {
+  font-size: 13px; letter-spacing: 0.02em;
+  color: var(--subtle);
+}
+h2 { font-family: var(--font-zh); font-weight: 600; font-size: 26px; line-height: 1.3; }
+section > p { color: var(--muted); font-size: 15px; }
+.block {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+pre {
+  margin: 0; padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: var(--font-mono); font-size: 14px; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word;
+}
+pre.zh { font-family: var(--font-zh); font-size: 16px; }
+button {
+  align-self: flex-start;
+  min-height: 44px; padding: 12px 24px;
+  background: var(--accent); color: var(--bg);
+  border: 0; border-radius: 12px;
+  font-family: var(--font-body); font-size: 17px; font-weight: 500;
+  cursor: pointer;
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+button:hover { opacity: 0.9; }
+button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+button.done { background: var(--accent-2); }
+footer { color: var(--subtle); font-size: 15px; border-top: 1px solid var(--border); padding-top: 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>設計與 AI，動手做</h1>
+  <p>每一段都有一個複製按鈕。貼到你的 Claude Code 裡面。</p>
+</header>
+
+<section>
+  <span class="label">1 &middot; 12 分鐘</span>
+  <h2>讓它問你問題，然後寫出你自己的技能</h2>
+  <p>從你剛才的答案開始。第一題的先做問我的，第二題的先做接續的，第三題的先做規則的。</p>
+  <div class="block">
+    <pre class="zh" id="p1">用繁體中文問我問題，一次問一個，用選擇題的方式。
+
+問我這些事：我做什麼樣的設計工作、我的設計系統長什麼樣、我最常重複做的事情是什麼、我最常被 AI 搞錯的地方是什麼、我跟工程師交接的時候什麼最容易出問題。
+
+問完之後，根據我的回答，幫我在 .claude/skills/ 裡面建立三個我自己的技能，不要照抄別人的。
+
+先問我一句：剛才演講的三個問題，哪一個最像你？然後先做那一個對應的技能，做完給我看，再做剩下兩個。
+
+一、一個問我問題的技能。在我給你工作之前，先用選擇題問我不清楚的地方。一次問一件事，用簡單的話，絕對不要問我「什麼時候要」或「要先做哪一件」。你要問的是設計上的選擇。
+
+二、一個交接的技能。每次工作結束，寫下這次的目標、做了什麼、每一個問題和它的原因、現在的狀態、還剩什麼沒做、哪些檔案重要。每個錯誤都要變成下一次的規則。
+
+三、一個接續的技能。新的對話開始時，讀最近的交接檔案，然後把交接檔案裡提到的每一個檔案都真的打開讀過，不要憑記憶猜內容。
+
+建立好以後告訴我怎麼呼叫它們，每一個用一句話說明。全部用繁體中文寫。</pre>
+    <button type="button" data-copy="p1">複製</button>
+  </div>
+</section>
+
+<section>
+  <span class="label">2 &middot; 15 分鐘</span>
+  <h2>做你自己產品的卡片</h2>
+  <p>用你自己真正在做的產品。不要用範例。</p>
+  <div class="block">
+    <pre class="zh" id="p2">幫我做三個版本的卡片，放在同一個檔案裡面並排顯示。
+
+我的產品是：（在這裡寫你的產品，一兩句就好）
+
+三個版本要在結構上不一樣，不是只有顏色不一樣。先做出來給我看，有不清楚的地方做完再問。</pre>
+    <button type="button" data-copy="p2">複製</button>
+  </div>
+</section>
+
+<section>
+  <span class="label">3</span>
+  <h2>看完之後，像設計師一樣反應</h2>
+  <p>說出哪裡不對。不要說「比較好」，說「這個標題和價格在打架」。然後問它這兩句。</p>
+  <div class="block">
+    <pre class="zh" id="p3">你有加任何我沒有給你的東西嗎？</pre>
+    <button type="button" data-copy="p3">複製</button>
+  </div>
+  <div class="block">
+    <pre class="zh" id="p4">你確定嗎？</pre>
+    <button type="button" data-copy="p4">複製</button>
+  </div>
+</section>
+
+<footer>
+  <p class="zh">先給規則，再給工作。</p>
+</footer>
+
+<script>
+document.querySelectorAll('[data-copy]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var text = document.getElementById(b.getAttribute('data-copy')).textContent;
+    function done() {
+      var was = b.textContent;
+      b.textContent = '已複製';
+      b.classList.add('done');
+      setTimeout(function () { b.textContent = was; b.classList.remove('done'); }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
+    /* Older phones and any page not served over https */
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {
+        b.textContent = '請手動選取';
+      }
+      document.body.removeChild(ta);
+    }
+  });
+});
+</script>
+</body>
+</html>
