@@ -40,16 +40,50 @@ body {
 }
 h1, h2, h3, p { margin: 0; }
 :lang(zh-TW), .zh { font-family: var(--font-zh); font-style: normal; }
+
+/* The language switch. His screen is English, the room's is Chinese, and
+   this is one file so the prompts can never drift apart. */
+.lang {
+  position: sticky; top: 0; z-index: 10;
+  margin: -24px -24px 0; padding: 12px 24px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: center;
+}
+.lang button {
+  min-height: 44px; padding: 10px 20px;
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 12px;
+  font-family: var(--font-body); font-size: 16px; cursor: pointer;
+}
+.lang button[aria-pressed="true"] {
+  background: var(--accent); color: var(--bg);
+  border-color: var(--accent); font-weight: 500;
+}
+.lang button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+:root[data-lang="en"] [data-zh] { display: none; }
+:root[data-lang="zh"] [data-en] { display: none; }
+
 header { display: flex; flex-direction: column; gap: 8px; }
 h1 { font-family: var(--font-zh); font-weight: 600; font-size: 34px; line-height: 1.25; }
+:root[data-lang="en"] h1 { font-family: var(--font-body); }
 header p { color: var(--muted); }
 section { display: flex; flex-direction: column; gap: 16px; }
-.label {
-  font-size: 13px; letter-spacing: 0.02em;
-  color: var(--subtle);
-}
+.label { font-size: 13px; letter-spacing: 0.02em; color: var(--subtle); }
 h2 { font-family: var(--font-zh); font-weight: 600; font-size: 26px; line-height: 1.3; }
+:root[data-lang="en"] h2 { font-family: var(--font-body); }
 section > p { color: var(--muted); font-size: 15px; }
+
+/* What they walk away with. The point of the round, stated before the prompt. */
+.outcome {
+  padding: 12px 16px;
+  border-left: 0;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  color: var(--fg); font-size: 15px;
+}
+.outcome b { color: var(--accent); }
+
 .block {
   display: flex; flex-direction: column; gap: 12px;
   padding: 16px;
@@ -66,7 +100,7 @@ pre {
   white-space: pre-wrap; word-break: break-word;
 }
 pre.zh { font-family: var(--font-zh); font-size: 16px; }
-button {
+button.copy {
   align-self: flex-start;
   min-height: 44px; padding: 12px 24px;
   background: var(--accent); color: var(--bg);
@@ -75,94 +109,214 @@ button {
   cursor: pointer;
   transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-button:hover { opacity: 0.9; }
-button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
-button.done { background: var(--accent-2); }
+button.copy:hover { opacity: 0.9; }
+button.copy:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+button.copy.done { background: var(--accent-2); }
 footer { color: var(--subtle); font-size: 15px; border-top: 1px solid var(--border); padding-top: 24px; }
 </style>
 </head>
 <body>
 
+<nav class="lang">
+  <button type="button" id="zh" aria-pressed="true">中文</button>
+  <button type="button" id="en" aria-pressed="false">English</button>
+</nav>
+
 <header>
-  <h1>設計與 AI，動手做</h1>
-  <p>每一段都有一個複製按鈕。貼到你的 Claude Code 裡面。</p>
+  <h1 data-zh>設計與 AI，動手做</h1>
+  <h1 data-en>Design and AI, hands on</h1>
+  <p data-zh>五個回合。每一個回合，我先說，再示範，然後換你做。每一段都有複製按鈕，貼到你的 Claude Code 裡面。</p>
+  <p data-en>Five rounds. Each one: I say it, I show it, then you do it. Every block has a copy button. Paste it into your own Claude Code.</p>
+  <p data-zh><b>在你自己的專案資料夾裡打開 Claude Code，不要在桌面。</b>它會跳出視窗問你可不可以寫檔案，按同意。</p>
+  <p data-en><b>Open Claude Code inside your own project folder, not on the Desktop.</b> It will ask permission to write files. Say yes.</p>
 </header>
 
 <section>
-  <span class="label">1 &middot; 12 分鐘</span>
-  <h2>讓它問你問題，然後寫出你自己的技能</h2>
-  <p>剛才的三個問題：上次 AI 幫你做的畫面留下多少、AI 知不知道你的設計規則、工程師做出來的和你的 Figma 一不一樣。想一下哪一個最像你。</p>
-  <p>先在你自己的專案資料夾裡打開 Claude Code，再貼。不要在桌面。</p>
-  <p><b>它會跳出一個視窗問你可不可以寫檔案。按同意。</b>不同意的話，技能會寫不進去。</p>
+  <span class="label" data-zh>回合 1 &middot; 它是嬰兒</span>
+  <span class="label" data-en>Round 1 &middot; It is a baby</span>
+  <h2 data-zh>讓它先問你，而不是先猜</h2>
+  <h2 data-en>Make it ask you instead of guessing</h2>
+  <p class="outcome" data-zh>做完你會有：<b>一個 ask-me 技能</b>，存在你自己專案的 <code>.claude/skills/</code> 裡面。以後每次工作前先叫它。</p>
+  <p class="outcome" data-en>You walk away with: <b>an ask-me skill</b>, saved in your own project at <code>.claude/skills/</code>. You call it before every job from now on.</p>
   <div class="block">
-    <pre class="zh" id="p1">用繁體中文問我問題，一次問一個，用選擇題的方式。總共只問三題，問完就開始做，中間不要再問我要不要繼續。
+    <pre class="zh" id="p1" data-zh>在這個資料夾的 .claude/skills/askme/ 裡面建立一個 SKILL.md。
 
-三題問我：我做什麼樣的設計工作、我最常被 AI 搞錯的地方、我跟工程師交接時什麼最容易出問題。
+這個技能的用途是：在我給你工作之前，先用選擇題問我不清楚的地方。
 
-問完之後，根據我的回答，直接在這個資料夾的 .claude/skills/ 裡面建立三個技能，不要照抄別人的，三個一次做完。
+內容要寫：
+一次只問一件事，用簡單的話，用選擇題。
+只問設計上的選擇，絕對不要問我「什麼時候要」或「要先做哪一個」。
+問到你有把握可以直接做為止，不要因為怕問太多就停。
+不要問我技術決定，那是你自己判斷。
 
-一、一個問我問題的技能。在我給你工作之前，先用選擇題問我不清楚的地方。一次問一件事，用簡單的話，絕對不要問我「什麼時候要」或「要先做哪一件」。你要問的是設計上的選擇。
+寫完以後告訴我檔案在哪裡，還有怎麼呼叫它。全部用繁體中文寫。</pre>
+    <pre id="p1e" data-en>Create a SKILL.md at .claude/skills/askme/ in this folder.
 
-二、一個交接的技能。每次工作結束，寫下這次的目標、做了什麼、每一個問題和它的原因、現在的狀態、還剩什麼沒做、哪些檔案重要。每個錯誤都要變成下一次的規則。
+What this skill is for: before you give me work, ask me about anything unclear, as multiple choice.
 
-三、一個接續的技能。新的對話開始時，讀最近的交接檔案，然後把交接檔案裡提到的每一個檔案都真的打開讀過，不要憑記憶猜內容。
+Write into it:
+Ask one thing at a time, in plain words, as multiple choice.
+Ask only about design choices. Never ask me when something is due or which item to do first.
+Keep asking until you can build without guessing. Do not stop because you think you have asked too many.
+Never ask me technical decisions. Those are yours to make.
 
-全部做完以後，告訴我檔案寫在哪裡，還有怎麼呼叫它們，每一個用一句話說明。全部用繁體中文寫。</pre>
-    <button type="button" data-copy="p1">複製</button>
+When it is written, tell me where the file is and how to call it.</pre>
+    <button class="copy" type="button" data-copy="p1">複製</button>
   </div>
 </section>
 
 <section>
-  <span class="label">2 &middot; 15 分鐘</span>
-  <h2>先寫三條規則，再做你自己產品的卡片</h2>
-  <p>用你自己真正在做的產品。不要用範例。在電腦上看，不要用手機看。</p>
-  <p>先寫三條規則，是因為感覺一定要先變成文字，才會變成系統。</p>
+  <span class="label" data-zh>回合 2 &middot; 規則先給</span>
+  <span class="label" data-en>Round 2 &middot; Rules first</span>
+  <h2 data-zh>把你的規則寫成檔案</h2>
+  <h2 data-en>Put your rules in files</h2>
+  <p class="outcome" data-zh>做完你會有：<b>一個 docs/design-rules/ 資料夾</b>。一個檔案管一件事。人會忘記，檔案不會。</p>
+  <p class="outcome" data-en>You walk away with: <b>a docs/design-rules/ folder</b>. One file owns one thing. People forget. A file does not.</p>
   <div class="block">
-    <pre class="zh" id="p2">先問我一件事：我的產品應該給人什麼感覺？等我回答以後，把我的回答變成三條具體的規則，寫成檔案，每一條都要能照著做，不要寫形容詞。
+    <pre class="zh" id="p2" data-zh>先用剛才的 askme 技能問我三個問題，問我的產品該有什麼感覺。
 
-然後照著那三條規則，幫我做三個版本的卡片，放在同一個檔案裡面並排顯示。
+然後在這個資料夾建立 docs/design-rules/，裡面四個檔案：
+
+brand.md 管顏色。每個顏色一個名字、一個色碼、一個 token 名稱，寫成表格。
+type.md 管字。字體、大小的級距、行高。
+spacing.md 管間距。一個基準步階，所有數值都是它的倍數，寫成表格。
+motion.md 管動態。時間長度和曲線。
+
+規則：每一個事實只能有一個檔案管。每個檔案開頭要寫「這個檔案管什麼」。
+不要寫形容詞，寫數值。沒有數值的就來問我，不要自己編。
+
+寫完告訴我每個檔案管什麼，一句話。全部用繁體中文寫。</pre>
+    <pre id="p2e" data-en>First use the askme skill you just wrote. Ask me three questions about how my product should feel.
+
+Then create docs/design-rules/ in this folder, with four files:
+
+brand.md owns colour. Every colour gets a name, a hex and a token name, in a table.
+type.md owns type. Families, the size scale, line heights.
+spacing.md owns spacing. One base step, every value a multiple of it, in a table.
+motion.md owns motion. Durations and curves.
+
+Rules: one fact is owned by exactly one file. Each file opens by stating what it owns.
+Write numbers, not adjectives. If you do not have a number, ask me. Never invent one.
+
+When done, tell me what each file owns, one line each.</pre>
+    <button class="copy" type="button" data-copy="p2">複製</button>
+  </div>
+</section>
+
+<section>
+  <span class="label" data-zh>回合 3 &middot; 感覺變系統</span>
+  <span class="label" data-en>Round 3 &middot; Feeling becomes a system</span>
+  <h2 data-zh>從規則做出東西</h2>
+  <h2 data-en>Build from the rules</h2>
+  <p class="outcome" data-zh>做完你會有：<b>三個版本的卡片</b>，每一個值都來自你剛才寫的規則，沒有一個是手寫的。</p>
+  <p class="outcome" data-en>You walk away with: <b>three versions of a card</b>, every value coming from the rules you just wrote, none of them typed by hand.</p>
+  <div class="block">
+    <pre class="zh" id="p3" data-zh>照著 docs/design-rules/ 裡面的規則，幫我做三個版本的卡片，放在同一個檔案裡並排顯示。
 
 我的產品是：（在這裡寫你的產品，一兩句就好）
 
-三個版本要在結構上不一樣，不是只有顏色不一樣。規則寫完就直接做，不要再問我問題。
+每一個顏色、大小、間距都要從規則檔案來，不可以手寫數字。
+三個版本要在結構上不一樣，不是只有顏色不一樣。
 
-做完告訴我規則檔案和卡片檔案的完整路徑，還有每一個版本用了哪一條規則。</pre>
-    <button type="button" data-copy="p2">複製</button>
+做完告訴我每個版本用了哪幾條規則，還有檔案的完整路徑。</pre>
+    <pre id="p3e" data-en>Using the rules in docs/design-rules/, make three versions of a card, side by side in one file.
+
+My product is: (write your product here, a sentence or two)
+
+Every colour, size and spacing value must come from the rule files. Never type a number by hand.
+The three versions must differ in structure, not just colour.
+
+When done, tell me which rules each version used, and the full path to the file.</pre>
+    <button class="copy" type="button" data-copy="p3">複製</button>
   </div>
 </section>
 
 <section>
-  <span class="label">3</span>
-  <h2>看完之後，像設計師一樣反應</h2>
-  <p>說出哪裡不對。不要說「比較好」，說「這個標題和價格在打架」。然後問它這兩句。</p>
+  <span class="label" data-zh>回合 4 &middot; 它會說謊</span>
+  <span class="label" data-en>Round 4 &middot; It lies</span>
+  <h2 data-zh>問它怎麼檢查的</h2>
+  <h2 data-en>Ask it how it checked</h2>
+  <p class="outcome" data-zh>做完你會知道：<b>「做好了」不是證據</b>。問兩次，看它改不改口。</p>
+  <p class="outcome" data-en>You walk away knowing: <b>"done" is not proof</b>. Ask twice and watch whether the story changes.</p>
   <div class="block">
-    <pre class="zh" id="p3">你有加任何我沒有給你的東西嗎？</pre>
-    <button type="button" data-copy="p3">複製</button>
+    <pre class="zh" id="p4" data-zh>你剛才說做好了。你怎麼檢查的？一步一步說。
+
+哪些是你真的執行過或打開看過的，哪些是你推測的？分開列出來。</pre>
+    <pre id="p4e" data-en>You said it was done. How did you check? Step by step.
+
+Which parts did you actually run or open and look at, and which did you infer? List them separately.</pre>
+    <button class="copy" type="button" data-copy="p4">複製</button>
   </div>
   <div class="block">
-    <pre class="zh" id="p4">你確定嗎？</pre>
-    <button type="button" data-copy="p4">複製</button>
+    <pre class="zh" id="p5" data-zh>你有加任何我沒有給你的東西嗎？</pre>
+    <pre id="p5e" data-en>Did you add anything I did not give you?</pre>
+    <button class="copy" type="button" data-copy="p5">複製</button>
+  </div>
+  <div class="block">
+    <pre class="zh" id="p6" data-zh>你確定嗎？</pre>
+    <pre id="p6e" data-en>Are you sure?</pre>
+    <button class="copy" type="button" data-copy="p6">複製</button>
+  </div>
+</section>
+
+<section>
+  <span class="label" data-zh>回合 5 &middot; 品味是你的</span>
+  <span class="label" data-en>Round 5 &middot; Taste is yours</span>
+  <h2 data-zh>說出哪裡不對，然後叫它修</h2>
+  <h2 data-en>Say what is wrong, then have it fixed</h2>
+  <p class="outcome" data-zh>做完你會知道：<b>AI 給你的是平均</b>。差別是有一個人說不夠好。不要說「比較好」，說「這個標題和價格在打架」。</p>
+  <p class="outcome" data-en>You walk away knowing: <b>what AI gives you is the average</b>. The difference is a person saying not good enough. Do not say "better". Say "this heading and this price are fighting".</p>
+  <div class="block">
+    <pre class="zh" id="p7" data-zh>我看了，這裡不對：（用你自己的話說，越具體越好。例如：標題和價格在打架、第二張卡片的留白和第一張不一樣、按鈕看起來不像可以按）
+
+照我說的修，只修我說的地方。修完告訴我你改了哪幾個值，還有那些值從哪一條規則來。</pre>
+    <pre id="p7e" data-en>I looked at it. This is wrong: (say it in your own words, as specific as you can. For example: the heading and the price are fighting, the second card's whitespace does not match the first, the button does not look pressable)
+
+Fix what I said, and only what I said. Then tell me which values you changed and which rule each one came from.</pre>
+    <button class="copy" type="button" data-copy="p7">複製</button>
   </div>
 </section>
 
 <footer>
-  <p class="zh">先給規則，再給工作。</p>
+  <p class="zh" data-zh>先給規則，再給工作。</p>
+  <p data-en>Rules first, then the work.</p>
 </footer>
 
 <script>
+/* The language switch. Chinese by default, because the room reads Chinese.
+   His own screen is English. Remembered per phone, never shared. */
+(function () {
+  var root = document.documentElement;
+  var bZh = document.getElementById('zh');
+  var bEn = document.getElementById('en');
+  function set(lang) {
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'zh' ? 'zh-TW' : 'en');
+    bZh.setAttribute('aria-pressed', String(lang === 'zh'));
+    bEn.setAttribute('aria-pressed', String(lang === 'en'));
+    try { localStorage.setItem('kit-lang', lang); } catch (e) {}
+  }
+  var saved = 'zh';
+  try { saved = localStorage.getItem('kit-lang') || 'zh'; } catch (e) {}
+  set(saved === 'en' ? 'en' : 'zh');
+  bZh.addEventListener('click', function () { set('zh'); });
+  bEn.addEventListener('click', function () { set('en'); });
+})();
+
+/* Copy whichever language is showing, so nobody pastes the wrong one. */
 document.querySelectorAll('[data-copy]').forEach(function (b) {
   b.addEventListener('click', function () {
-    var text = document.getElementById(b.getAttribute('data-copy')).textContent;
+    var base = b.getAttribute('data-copy');
+    var lang = document.documentElement.getAttribute('data-lang');
+    var el = document.getElementById(lang === 'en' ? base + 'e' : base);
+    if (!el) el = document.getElementById(base);
+    var text = el.textContent;
     function done() {
       var was = b.textContent;
-      b.textContent = '已複製';
+      b.textContent = lang === 'en' ? 'Copied' : '已複製';
       b.classList.add('done');
       setTimeout(function () { b.textContent = was; b.classList.remove('done'); }, 1600);
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, fallback);
-    } else { fallback(); }
-    /* Older phones and any page not served over https */
     function fallback() {
       var ta = document.createElement('textarea');
       ta.value = text;
@@ -171,12 +325,28 @@ document.querySelectorAll('[data-copy]').forEach(function (b) {
       document.body.appendChild(ta);
       ta.select();
       try { document.execCommand('copy'); done(); } catch (e) {
-        b.textContent = '請手動選取';
+        b.textContent = lang === 'en' ? 'Select it by hand' : '請手動選取';
       }
       document.body.removeChild(ta);
     }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
   });
 });
+
+/* The copy button's own label follows the language too. */
+(function () {
+  var root = document.documentElement;
+  function labels() {
+    var en = root.getAttribute('data-lang') === 'en';
+    document.querySelectorAll('button.copy').forEach(function (b) {
+      if (!b.classList.contains('done')) b.textContent = en ? 'Copy' : '複製';
+    });
+  }
+  new MutationObserver(labels).observe(root, { attributes: true, attributeFilter: ['data-lang'] });
+  labels();
+})();
 </script>
 </body>
 </html>
